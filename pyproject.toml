@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name               = "generate_protodune_trigger_training_data"
+version            = "0.1.0"
+description        = "Package to manage loading and manipulating training data"
+readme             = "README.md"
+requires-python    = ">=3.9"
+
+authors = [
+  { name  = "Ciaran Hasnip", email = "ciaran.mark.hasnip@cern.ch"}
+]
+
+license = { text = "MIT" }
+
+dependencies = [
+  "rich"
+]
+
