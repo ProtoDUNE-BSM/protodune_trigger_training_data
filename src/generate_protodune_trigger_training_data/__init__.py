@@ -1,3 +1,3 @@
-import convert_artroot_training_data_to_hdf5
-import bin_protodune_training_data
-import bin_combined_plane_protodune_training_data
+from . import convert_artroot_training_data_to_hdf5
+from . import bin_protodune_training_data
+from . import bin_combined_plane_protodune_training_data

@@ -1,0 +1,23 @@
+# Core numerical / data stack
+numpy>=1.23,<2
+scipy>=1.8
+pandas>=1.5
+matplotlib>=3.5
+seaborn>=0.12
+
+# Machine learning / training
+scikit-learn>=1.1
+torch>=1.13  # or tensorflow>=2.10 if you prefer TF
+xgboost
+lightgbm
+
+# HEP / file IO
+uproot>=4.0
+awkward>=1.9
+h5py
+
+# Utilities
+tqdm
+joblib
+numba
+scikit-image
