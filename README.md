@@ -26,7 +26,7 @@ After installing the source code, follow these steps:
 ### 1. Create the virtual environment
 From the repository root:
 ```
-python3 -m venv venv
+python3 -m venv 
 ```
 This creates a virtual environment in a directory called venv/.
 

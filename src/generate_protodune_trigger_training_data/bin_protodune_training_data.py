@@ -6,6 +6,25 @@ import pandas as pd
 import os
 import sys
 
+class PDVDEffectiveChannelMap:
+  def __init__(self, first_channel, n_channels):
+    self.first_channel = first_channel
+    self.n_channels = n_channels
+    self.n_channels_crp_block = self.n_channels / 4 # four crps in a plane, should = 292
+    self.n_effective_channels = self.n_channels / 2
+
+  def get_effective_channel_id(self, channel_id):
+    # for pdvd, the effective channel id is the channel id within a crp block 
+    # so that the same effective channel id corresponds to the same physical location 
+    # on each crp in the plane 
+    channel_id_in_plane = channel_id - self.first_channel
+    crp_block = channel_id_in_plane // self.n_channels_crp_block
+    channel_id_in_crp_block = channel_id_in_plane % self.n_channels_crp_block
+    base_channel  = (crp_block >= 2) * self.n_channels_crp_block
+    return channel_id_in_crp_block + base_channel + self.first_channel
+  
+  def get_n_effective_channels(self): return self.n_effective_channels
+
 def parse_args():
   parser = argparse.ArgumentParser(
       description="Create binned images from TPWindowTree HDF5 data."
@@ -177,8 +196,17 @@ def main():
           first_channel = plane_chans.first_channel.item()
           last_channel = first_channel + plane_chans.n_channels.item()
 
+          # Map to effective channels if we are in np02/pdvd
+          if args.detector == "np02":
+            eff_chan_map = PDVDEffectiveChannelMap(first_channel, plane_chans.n_channels.item())
+            first_channel = eff_chan_map.get_effective_channel_id(first_channel)
+            last_channel = first_channel + eff_chan_map.get_n_effective_channels()
+
           # Create channel binning for this sub-event in this apa/crp
           channel_bins = np.linspace(first_channel, last_channel, int(args.nchannelbins) + 1)
+
+          # Map to effective channels if we are in np02/pdvd
+          channelid = eff_chan_map.get_effective_channel_id(channelid) if args.detector == "np02" else channelid
 
           if not timepeak[mask].size:
             continue
@@ -187,7 +215,6 @@ def main():
 
           # Create time binning based on the first TP time in the window plus 20k ticks
           time_bins = np.linspace(earliest_time, earliest_time + 20000, int(args.ntimebins) + 1)
-
           # create image
           img = bin_subevent(
               timepeak,
