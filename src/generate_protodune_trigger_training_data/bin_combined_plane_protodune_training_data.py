@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import os
 import sys
+from .pdvd_effective_channel_map import PDVDEffectiveChannelMap
 
 def parse_args():
   parser = argparse.ArgumentParser(
@@ -175,16 +176,31 @@ def main():
           # Plane 0 channel binning
           first_channel_p0 = plane_chans_p0.first_channel.item()
           last_channel_p0 = first_channel_p0 + plane_chans_p0.n_channels.item()
+          if args.detector == "np02":
+            eff_chan_map_p0 = PDVDEffectiveChannelMap(first_channel_p0, plane_chans_p0.n_channels.item())
+            first_channel_p0 = eff_chan_map_p0.get_effective_channel_id(first_channel_p0)
+            last_channel_p0 = first_channel_p0 + eff_chan_map_p0.get_n_effective_channels()
+
           channel_bins_p0 = np.linspace(first_channel_p0, last_channel_p0, int(args.nchannelbins) + 1)
 
           # Plane 1 channel binning
           first_channel_p1 = plane_chans_p1.first_channel.item()
           last_channel_p1 = first_channel_p1 + plane_chans_p1.n_channels.item()
+          if args.detector == "np02":
+            eff_chan_map_p1 = PDVDEffectiveChannelMap(first_channel_p1, plane_chans_p1.n_channels.item())
+            first_channel_p1 = eff_chan_map_p1.get_effective_channel_id(first_channel_p1)
+            last_channel_p1 = first_channel_p1 + eff_chan_map_p1.get_n_effective_channels()
+
           channel_bins_p1 = np.linspace(first_channel_p1, last_channel_p1, int(args.nchannelbins) + 1)
-          
-          # Plane 0 channel binning
+
+          # Plane 2 channel binning
           first_channel_p2 = plane_chans_p2.first_channel.item()
           last_channel_p2 = first_channel_p2 + plane_chans_p2.n_channels.item()
+          if args.detector == "np02":
+            eff_chan_map_p2 = PDVDEffectiveChannelMap(first_channel_p2, plane_chans_p2.n_channels.item())
+            first_channel_p2 = eff_chan_map_p2.get_effective_channel_id(first_channel_p2)
+            last_channel_p2 = first_channel_p2 + eff_chan_map_p2.get_n_effective_channels()
+
           channel_bins_p2 = np.linspace(first_channel_p2, last_channel_p2, int(args.nchannelbins) + 1)
 
           # base time binning only on plane 2
@@ -193,10 +209,14 @@ def main():
           # Create time binning based on the first TP time in the window plus 20k ticks
           time_bins = np.linspace(earliest_time, earliest_time + 20000, int(args.ntimebins) + 1)
 
+          channelid_p0 = eff_chan_map_p0.get_effective_channel_id(channelid) if args.detector == "np02" else channelid
+          channelid_p1 = eff_chan_map_p1.get_effective_channel_id(channelid) if args.detector == "np02" else channelid
+          channelid_p2 = eff_chan_map_p2.get_effective_channel_id(channelid) if args.detector == "np02" else channelid
+
           # create image
           img_p0 = bin_subevent(
               timepeak,
-              channelid,
+              channelid_p0,
               adcintegral,
               mask_p0,
               time_bins,
@@ -204,7 +224,7 @@ def main():
               )
           img_p1 = bin_subevent(
               timepeak,
-              channelid,
+              channelid_p1,
               adcintegral,
               mask_p1,
               time_bins,
@@ -212,7 +232,7 @@ def main():
               )
           img_p2 = bin_subevent(
               timepeak,
-              channelid,
+              channelid_p2,
               adcintegral,
               mask_p2,
               time_bins,

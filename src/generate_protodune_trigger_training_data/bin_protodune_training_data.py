@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 import os
 import sys
-
+from .pdvd_effective_channel_map import PDVDEffectiveChannelMap
+'''
 class PDVDEffectiveChannelMap:
   def __init__(self, first_channel, n_channels):
     self.first_channel = first_channel
@@ -24,7 +25,7 @@ class PDVDEffectiveChannelMap:
     return channel_id_in_crp_block + base_channel + self.first_channel
   
   def get_n_effective_channels(self): return self.n_effective_channels
-
+'''
 def parse_args():
   parser = argparse.ArgumentParser(
       description="Create binned images from TPWindowTree HDF5 data."
