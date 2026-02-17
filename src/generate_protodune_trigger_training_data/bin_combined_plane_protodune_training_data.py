@@ -172,9 +172,15 @@ def main():
           plane_chans_p0 = det_map[(det_map.tpc == apacrp_id) & (det_map.plane == 0)]
           plane_chans_p1 = det_map[(det_map.tpc == apacrp_id) & (det_map.plane == 1)]
           plane_chans_p2 = det_map[(det_map.tpc == apacrp_id) & (det_map.plane == 2)]
- 
+          print('plane_chans_p0:')
+          print(plane_chans_p0)
+          print(len(plane_chans_p0))
+          print('plane_chans_p0.first_channel:')
+          print(type(plane_chans_p0.first_channel))
+          print(plane_chans_p0.first_channel)
           # Plane 0 channel binning
-          first_channel_p0 = plane_chans_p0.first_channel.item()
+          #first_channel_p0 = plane_chans_p0.first_channel.item()
+          first_channel_p0 = plane_chans_p0["first_channel"].iloc[0]
           last_channel_p0 = first_channel_p0 + plane_chans_p0.n_channels.item()
           if args.detector == "np02":
             eff_chan_map_p0 = PDVDEffectiveChannelMap(first_channel_p0, plane_chans_p0.n_channels.item())
@@ -184,7 +190,8 @@ def main():
           channel_bins_p0 = np.linspace(first_channel_p0, last_channel_p0, int(args.nchannelbins) + 1)
 
           # Plane 1 channel binning
-          first_channel_p1 = plane_chans_p1.first_channel.item()
+          #first_channel_p1 = plane_chans_p1.first_channel.item()
+          first_channel_p1 = plane_chans_p1["first_channel"].iloc[0]
           last_channel_p1 = first_channel_p1 + plane_chans_p1.n_channels.item()
           if args.detector == "np02":
             eff_chan_map_p1 = PDVDEffectiveChannelMap(first_channel_p1, plane_chans_p1.n_channels.item())
@@ -194,7 +201,8 @@ def main():
           channel_bins_p1 = np.linspace(first_channel_p1, last_channel_p1, int(args.nchannelbins) + 1)
 
           # Plane 2 channel binning
-          first_channel_p2 = plane_chans_p2.first_channel.item()
+          #first_channel_p2 = plane_chans_p2.first_channel.item()
+          first_channel_p2 = plane_chans_p2["first_channel"].iloc[0]
           last_channel_p2 = first_channel_p2 + plane_chans_p2.n_channels.item()
           if args.detector == "np02":
             eff_chan_map_p2 = PDVDEffectiveChannelMap(first_channel_p2, plane_chans_p2.n_channels.item())
