@@ -73,6 +73,7 @@ def build_pdhd_plane_map():
   df = pd.DataFrame(data)
   return df
 
+'''
 def build_pdvd_plane_map():
   data = [
       {"tpc": 2, "plane": 0, "first_channel":  6144, "n_channels":  952},
@@ -90,6 +91,29 @@ def build_pdvd_plane_map():
       {"tpc": 5, "plane": 0, "first_channel":     0, "n_channels":  952},
       {"tpc": 5, "plane": 1, "first_channel":   952, "n_channels":  952},
       {"tpc": 5, "plane": 2, "first_channel":  1904, "n_channels": 1168}
+  ]
+
+  df = pd.DataFrame(data)
+  return df
+'''
+
+def build_pdvd_plane_map():
+  data = [
+      {"tpc": 1, "plane": 0, "first_channel":  6144, "n_channels":  952},
+      {"tpc": 1, "plane": 1, "first_channel":  7096, "n_channels":  952},
+      {"tpc": 1, "plane": 2, "first_channel":  8048, "n_channels": 1168},
+
+      {"tpc": 2, "plane": 0, "first_channel":  9216, "n_channels":  952},
+      {"tpc": 2, "plane": 1, "first_channel": 10168, "n_channels":  952},
+      {"tpc": 2, "plane": 2, "first_channel": 11120, "n_channels": 1168},
+
+      {"tpc": 3, "plane": 0, "first_channel":  3072, "n_channels":  952},
+      {"tpc": 3, "plane": 1, "first_channel":  4024, "n_channels":  952},
+      {"tpc": 3, "plane": 2, "first_channel":  4976, "n_channels": 1168},
+
+      {"tpc": 4, "plane": 0, "first_channel":     0, "n_channels":  952},
+      {"tpc": 4, "plane": 1, "first_channel":   952, "n_channels":  952},
+      {"tpc": 4, "plane": 2, "first_channel":  1904, "n_channels": 1168}
   ]
 
   df = pd.DataFrame(data)
@@ -179,8 +203,8 @@ def main():
           print(type(plane_chans_p0.first_channel))
           print(plane_chans_p0.first_channel)
           # Plane 0 channel binning
-          #first_channel_p0 = plane_chans_p0.first_channel.item()
-          first_channel_p0 = plane_chans_p0["first_channel"].iloc[0]
+          first_channel_p0 = plane_chans_p0.first_channel.item()
+          #first_channel_p0 = plane_chans_p0["first_channel"].iloc[0]
           last_channel_p0 = first_channel_p0 + plane_chans_p0.n_channels.item()
           if args.detector == "np02":
             eff_chan_map_p0 = PDVDEffectiveChannelMap(first_channel_p0, plane_chans_p0.n_channels.item())
@@ -190,8 +214,8 @@ def main():
           channel_bins_p0 = np.linspace(first_channel_p0, last_channel_p0, int(args.nchannelbins) + 1)
 
           # Plane 1 channel binning
-          #first_channel_p1 = plane_chans_p1.first_channel.item()
-          first_channel_p1 = plane_chans_p1["first_channel"].iloc[0]
+          first_channel_p1 = plane_chans_p1.first_channel.item()
+          #first_channel_p1 = plane_chans_p1["first_channel"].iloc[0]
           last_channel_p1 = first_channel_p1 + plane_chans_p1.n_channels.item()
           if args.detector == "np02":
             eff_chan_map_p1 = PDVDEffectiveChannelMap(first_channel_p1, plane_chans_p1.n_channels.item())
@@ -201,8 +225,8 @@ def main():
           channel_bins_p1 = np.linspace(first_channel_p1, last_channel_p1, int(args.nchannelbins) + 1)
 
           # Plane 2 channel binning
-          #first_channel_p2 = plane_chans_p2.first_channel.item()
-          first_channel_p2 = plane_chans_p2["first_channel"].iloc[0]
+          first_channel_p2 = plane_chans_p2.first_channel.item()
+          #first_channel_p2 = plane_chans_p2["first_channel"].iloc[0]
           last_channel_p2 = first_channel_p2 + plane_chans_p2.n_channels.item()
           if args.detector == "np02":
             eff_chan_map_p2 = PDVDEffectiveChannelMap(first_channel_p2, plane_chans_p2.n_channels.item())
