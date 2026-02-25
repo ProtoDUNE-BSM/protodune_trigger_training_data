@@ -9,7 +9,6 @@ seaborn>=0.12
 scikit-learn>=1.1
 torch>=1.13  # or tensorflow>=2.10 if you prefer TF
 xgboost
-lightgbm
 
 # HEP / file IO
 uproot>=4.0
