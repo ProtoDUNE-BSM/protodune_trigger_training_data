@@ -26,7 +26,7 @@ After installing the source code, follow these steps:
 ### 1. Create the virtual environment
 From the repository root:
 ```
-python3 -m venv 
+python3 -m venv venv
 ```
 This creates a virtual environment in a directory called venv/.
 
@@ -114,7 +114,7 @@ python -m generate_protodune_trigger_training_data.convert_artroot_training_data
 
 Finally you can bin the data and output the binned data to a '.npz' file:
 ```
-python -m generate_protodune_trigger_training_data.bin_combined_plane_protodune_training_data.py \
+python -m generate_protodune_trigger_training_data.bin_combined_plane_protodune_training_data \
     -i $OUTHDF5NU -o $OUTBINNEDNU -d "np04" --noapa1 -t 10 -c 10
 ```
 This function will bin the hdf5 data for the NP04 detector, ignorinf APA 1 and with 10 time and channel bins.

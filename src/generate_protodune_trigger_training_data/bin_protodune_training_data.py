@@ -6,26 +6,7 @@ import pandas as pd
 import os
 import sys
 from .pdvd_effective_channel_map import PDVDEffectiveChannelMap
-'''
-class PDVDEffectiveChannelMap:
-  def __init__(self, first_channel, n_channels):
-    self.first_channel = first_channel
-    self.n_channels = n_channels
-    self.n_channels_crp_block = self.n_channels / 4 # four crps in a plane, should = 292
-    self.n_effective_channels = self.n_channels / 2
 
-  def get_effective_channel_id(self, channel_id):
-    # for pdvd, the effective channel id is the channel id within a crp block 
-    # so that the same effective channel id corresponds to the same physical location 
-    # on each crp in the plane 
-    channel_id_in_plane = channel_id - self.first_channel
-    crp_block = channel_id_in_plane // self.n_channels_crp_block
-    channel_id_in_crp_block = channel_id_in_plane % self.n_channels_crp_block
-    base_channel  = (crp_block >= 2) * self.n_channels_crp_block
-    return channel_id_in_crp_block + base_channel + self.first_channel
-  
-  def get_n_effective_channels(self): return self.n_effective_channels
-'''
 def parse_args():
   parser = argparse.ArgumentParser(
       description="Create binned images from TPWindowTree HDF5 data."
@@ -102,21 +83,21 @@ def build_pdhd_plane_map():
 
 def build_pdvd_plane_map():
   data = [
-      {"tpc": 2, "plane": 0, "first_channel":  6144, "n_channels":  952},
-      {"tpc": 2, "plane": 1, "first_channel":  7096, "n_channels":  952},
-      {"tpc": 2, "plane": 2, "first_channel":  8048, "n_channels": 1168},
+      {"tpc": 1, "plane": 0, "first_channel":  6144, "n_channels":  952},
+      {"tpc": 1, "plane": 1, "first_channel":  7096, "n_channels":  952},
+      {"tpc": 1, "plane": 2, "first_channel":  8048, "n_channels": 1168},
 
-      {"tpc": 3, "plane": 0, "first_channel":  9216, "n_channels":  952},
-      {"tpc": 3, "plane": 1, "first_channel": 10168, "n_channels":  952},
-      {"tpc": 3, "plane": 2, "first_channel": 11120, "n_channels": 1168},
+      {"tpc": 2, "plane": 0, "first_channel":  9216, "n_channels":  952},
+      {"tpc": 2, "plane": 1, "first_channel": 10168, "n_channels":  952},
+      {"tpc": 2, "plane": 2, "first_channel": 11120, "n_channels": 1168},
 
-      {"tpc": 4, "plane": 0, "first_channel":  3072, "n_channels":  952},
-      {"tpc": 4, "plane": 1, "first_channel":  4024, "n_channels":  952},
-      {"tpc": 4, "plane": 2, "first_channel":  4976, "n_channels": 1168},
-
-      {"tpc": 5, "plane": 0, "first_channel":     0, "n_channels":  952},
-      {"tpc": 5, "plane": 1, "first_channel":   952, "n_channels":  952},
-      {"tpc": 5, "plane": 2, "first_channel":  1904, "n_channels": 1168}
+      {"tpc": 3, "plane": 0, "first_channel":  3072, "n_channels":  952},
+      {"tpc": 3, "plane": 1, "first_channel":  4024, "n_channels":  952},
+      {"tpc": 3, "plane": 2, "first_channel":  4976, "n_channels": 1168},
+      
+      {"tpc": 4, "plane": 0, "first_channel":     0, "n_channels":  952},
+      {"tpc": 4, "plane": 1, "first_channel":   952, "n_channels":  952},
+      {"tpc": 4, "plane": 2, "first_channel":  1904, "n_channels": 1168}
   ]
 
   df = pd.DataFrame(data)
@@ -198,7 +179,8 @@ def main():
           last_channel = first_channel + plane_chans.n_channels.item()
 
           # Map to effective channels if we are in np02/pdvd
-          if args.detector == "np02":
+          # Only doing effictive channel map for collection plane for now since induction effective mapping is complicated
+          if args.detector == "np02" and args.planechoice == 2:
             eff_chan_map = PDVDEffectiveChannelMap(first_channel, plane_chans.n_channels.item())
             first_channel = eff_chan_map.get_effective_channel_id(first_channel)
             last_channel = first_channel + eff_chan_map.get_n_effective_channels()

@@ -73,30 +73,6 @@ def build_pdhd_plane_map():
   df = pd.DataFrame(data)
   return df
 
-'''
-def build_pdvd_plane_map():
-  data = [
-      {"tpc": 2, "plane": 0, "first_channel":  6144, "n_channels":  952},
-      {"tpc": 2, "plane": 1, "first_channel":  7096, "n_channels":  952},
-      {"tpc": 2, "plane": 2, "first_channel":  8048, "n_channels": 1168},
-
-      {"tpc": 3, "plane": 0, "first_channel":  9216, "n_channels":  952},
-      {"tpc": 3, "plane": 1, "first_channel": 10168, "n_channels":  952},
-      {"tpc": 3, "plane": 2, "first_channel": 11120, "n_channels": 1168},
-
-      {"tpc": 4, "plane": 0, "first_channel":  3072, "n_channels":  952},
-      {"tpc": 4, "plane": 1, "first_channel":  4024, "n_channels":  952},
-      {"tpc": 4, "plane": 2, "first_channel":  4976, "n_channels": 1168},
-
-      {"tpc": 5, "plane": 0, "first_channel":     0, "n_channels":  952},
-      {"tpc": 5, "plane": 1, "first_channel":   952, "n_channels":  952},
-      {"tpc": 5, "plane": 2, "first_channel":  1904, "n_channels": 1168}
-  ]
-
-  df = pd.DataFrame(data)
-  return df
-'''
-
 def build_pdvd_plane_map():
   data = [
       {"tpc": 1, "plane": 0, "first_channel":  6144, "n_channels":  952},
@@ -157,7 +133,7 @@ def main():
   
   with h5py.File(args.inputfile, "r") as f:
     events = f["events"]
-    print(f'There are {len(events)} events in the file')
+    print(f'There are {len(events)} events in {args.inputfile}')
     for event_name in events:
       event = events[event_name]
       
@@ -196,38 +172,24 @@ def main():
           plane_chans_p0 = det_map[(det_map.tpc == apacrp_id) & (det_map.plane == 0)]
           plane_chans_p1 = det_map[(det_map.tpc == apacrp_id) & (det_map.plane == 1)]
           plane_chans_p2 = det_map[(det_map.tpc == apacrp_id) & (det_map.plane == 2)]
-          print('plane_chans_p0:')
-          print(plane_chans_p0)
-          print(len(plane_chans_p0))
-          print('plane_chans_p0.first_channel:')
-          print(type(plane_chans_p0.first_channel))
-          print(plane_chans_p0.first_channel)
+          
           # Plane 0 channel binning
           first_channel_p0 = plane_chans_p0.first_channel.item()
-          #first_channel_p0 = plane_chans_p0["first_channel"].iloc[0]
           last_channel_p0 = first_channel_p0 + plane_chans_p0.n_channels.item()
-          if args.detector == "np02":
-            eff_chan_map_p0 = PDVDEffectiveChannelMap(first_channel_p0, plane_chans_p0.n_channels.item())
-            first_channel_p0 = eff_chan_map_p0.get_effective_channel_id(first_channel_p0)
-            last_channel_p0 = first_channel_p0 + eff_chan_map_p0.get_n_effective_channels()
 
           channel_bins_p0 = np.linspace(first_channel_p0, last_channel_p0, int(args.nchannelbins) + 1)
 
           # Plane 1 channel binning
           first_channel_p1 = plane_chans_p1.first_channel.item()
-          #first_channel_p1 = plane_chans_p1["first_channel"].iloc[0]
           last_channel_p1 = first_channel_p1 + plane_chans_p1.n_channels.item()
-          if args.detector == "np02":
-            eff_chan_map_p1 = PDVDEffectiveChannelMap(first_channel_p1, plane_chans_p1.n_channels.item())
-            first_channel_p1 = eff_chan_map_p1.get_effective_channel_id(first_channel_p1)
-            last_channel_p1 = first_channel_p1 + eff_chan_map_p1.get_n_effective_channels()
 
           channel_bins_p1 = np.linspace(first_channel_p1, last_channel_p1, int(args.nchannelbins) + 1)
 
           # Plane 2 channel binning
           first_channel_p2 = plane_chans_p2.first_channel.item()
-          #first_channel_p2 = plane_chans_p2["first_channel"].iloc[0]
           last_channel_p2 = first_channel_p2 + plane_chans_p2.n_channels.item()
+          # Effective channel mapping only for plane 2 for now
+          # Mapping for planes 0 and 1 is complicated.
           if args.detector == "np02":
             eff_chan_map_p2 = PDVDEffectiveChannelMap(first_channel_p2, plane_chans_p2.n_channels.item())
             first_channel_p2 = eff_chan_map_p2.get_effective_channel_id(first_channel_p2)
@@ -241,8 +203,8 @@ def main():
           # Create time binning based on the first TP time in the window plus 20k ticks
           time_bins = np.linspace(earliest_time, earliest_time + 20000, int(args.ntimebins) + 1)
 
-          channelid_p0 = eff_chan_map_p0.get_effective_channel_id(channelid) if args.detector == "np02" else channelid
-          channelid_p1 = eff_chan_map_p1.get_effective_channel_id(channelid) if args.detector == "np02" else channelid
+          channelid_p0 = channelid
+          channelid_p1 = channelid
           channelid_p2 = eff_chan_map_p2.get_effective_channel_id(channelid) if args.detector == "np02" else channelid
 
           # create image
