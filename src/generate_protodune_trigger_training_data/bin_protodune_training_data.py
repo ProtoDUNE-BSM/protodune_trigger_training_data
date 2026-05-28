@@ -78,8 +78,7 @@ def build_pdhd_plane_map():
       {"tpc": 4, "plane": 2, "first_channel": 9280, "n_channels": 480}
   ]
 
-  df = pd.DataFrame(data)
-  return df
+  return pd.DataFrame(data)
 
 def build_pdvd_plane_map():
   data = [
@@ -100,9 +99,7 @@ def build_pdvd_plane_map():
       {"tpc": 4, "plane": 2, "first_channel":  1904, "n_channels": 1168}
   ]
 
-  df = pd.DataFrame(data)
-  return df
-
+  return pd.DataFrame(data)
 
 def bin_subevent(
     timepeak, channelid, adcintegral,
@@ -145,7 +142,8 @@ def main():
   with h5py.File(args.inputfile, "r") as f:
     events = f["events"]
     print(f'There are {len(events)} events in the file')
-    for event_name in events:
+    # add an event counter. Label each sub event with the number for the total event it came from.
+    for event_counter, event_name in enumerate(events, start=1):
       event = events[event_name]
       
       timepeak_event    = event["Window_timepeak"]
@@ -210,7 +208,8 @@ def main():
 
           # If you were to filter training data based on aggregate TP properties 
           # (e.g. total charge) then place those cuts here
-          all_images.append(img)
+          # Append image to list along with event counter for later train/test splitting
+          all_images.append([event_counter, img])
 
   print('saving images in a .npz file')
   np.savez_compressed(args.outputfile,
