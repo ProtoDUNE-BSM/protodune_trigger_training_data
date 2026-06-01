@@ -128,6 +128,9 @@ def main():
   plane0_list = []
   plane1_list = []
   plane2_list = []
+  plane0_event_ids = []
+  plane1_event_ids = []
+  plane2_event_ids = []
   
   with h5py.File(args.inputfile, "r") as f:
     events = f["events"]
@@ -238,15 +241,22 @@ def main():
 
           # Save image with event counter as label. 
           # This will allow us to do event-level train/test splits later on if we want to.
-          plane0_list.append([event_counter, img_p0])
-          plane1_list.append([event_counter, img_p1])
-          plane2_list.append([event_counter, img_p2])
+          plane0_list.append(img_p0)
+          plane1_list.append(img_p1)
+          plane2_list.append(img_p2)
+          
+          plane0_event_ids.append(event_counter)
+          plane1_event_ids.append(event_counter)
+          plane2_event_ids.append(event_counter)
 
   print('saving images in a .npz file')
   np.savez_compressed(args.outputfile,
                       plane0=np.array(plane0_list),
                       plane1=np.array(plane1_list),
-                      plane2=np.array(plane2_list))
+                      plane2=np.array(plane2_list),
+                      plane0_event_ids=np.array(plane0_event_ids),
+                      plane1_event_ids=np.array(plane1_event_ids),
+                      plane2_event_ids=np.array(plane2_event_ids))
 
   print(f"Saved {len(plane0_list)} p0 images to {args.outputfile}")
   print(f"Saved {len(plane1_list)} p1 images to {args.outputfile}")
