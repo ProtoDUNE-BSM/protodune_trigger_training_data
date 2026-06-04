@@ -138,6 +138,8 @@ def main():
   print(f'chosen plane: {args.planechoice}')
 
   all_images = []      # <- flat list of 2D histograms
+  event_ids = []      # <- list of event ids corresponding to each image (for train/test splitting)
+  neutrino_energies = []  # <- list of neutrino energies for each image (if available)
   
   with h5py.File(args.inputfile, "r") as f:
     events = f["events"]
@@ -151,6 +153,8 @@ def main():
       adcintegral_event = event["Window_adcintegral"]
       apacrp_event      = event["Window_apacrp"]
       planeid_event     = event["Window_planeid"]
+      
+      neutrino_energy   = event["genie_E"] if "genie_E" in event else None
 
       # Loop over sub-events
       for sub in timepeak_event:
@@ -210,10 +214,15 @@ def main():
           # (e.g. total charge) then place those cuts here
           # Append image to list along with event counter for later train/test splitting
           all_images.append([event_counter, img])
+          event_ids.append(event_counter)
+          if neutrino_energy is not None:
+            neutrino_energies.append(neutrino_energy)
 
   print('saving images in a .npz file')
   np.savez_compressed(args.outputfile,
-                      images=np.array(all_images))
+                      images=np.array(all_images),
+                      event_ids=np.array(event_ids),
+                      neutrino_energies=np.array(neutrino_energies))
 
   print(f"Saved {len(all_images)} images to {args.outputfile}")
 

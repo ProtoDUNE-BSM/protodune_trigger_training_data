@@ -19,6 +19,7 @@ def print_hdf5_structure(filename):
 # a hdf5 file.
 
 def uproot_to_hdf5(filelist, output_hdf5, neutrino_only=False):
+  # sourcery skip: assign-if-exp, swap-if-else-branches, use-named-expression
  
   branches = [
       "Window_apacrp",
@@ -29,6 +30,10 @@ def uproot_to_hdf5(filelist, output_hdf5, neutrino_only=False):
       "Window_tot",
       "Window_adcpeak",
       ]
+  
+  genie_branches = [
+      "E"
+  ]
 
   # --- Read ROOT file ---
   for filename in filelist:
@@ -38,7 +43,10 @@ def uproot_to_hdf5(filelist, output_hdf5, neutrino_only=False):
         tree = f["GeneralProtoDUNETriggerTrainingDataMaker/TPWindowTree"]
       else:
         tree = f["GeneralProtoDUNETriggerTrainingDataMaker/TPNuWindowTree"]
+        tree_genie = f["GeneralProtoDUNETriggerTrainingDataMaker/GenieTruth"]
       arrays = tree.arrays(branches, library="np")
+      if neutrino_only:
+        arrays_genie = tree_genie.arrays(library="np")
 
     # --- Write HDF5 ---
     with h5py.File(output_hdf5, "a") as h5f:
@@ -55,6 +63,12 @@ def uproot_to_hdf5(filelist, output_hdf5, neutrino_only=False):
         next_event = 0
 
       num_events = len(arrays[branches[0]])
+      
+      if neutrino_only:
+        num_events_genie = len(arrays_genie[genie_branches[0]])
+        if num_events != num_events_genie:
+          raise ValueError(f"Number of events in TPNuWindowTree ({num_events}) does not match number of events in GenieTruth ({num_events_genie})")
+        
       for i in range(num_events):
 
         event_group = events_group.create_group(f"event_{next_event + i}")
@@ -65,6 +79,11 @@ def uproot_to_hdf5(filelist, output_hdf5, neutrino_only=False):
           for j, subvec in enumerate(subevents):
             arr = np.asarray(subvec, dtype=np.int32)
             br_group.create_dataset(f"subevent_{j}", data=arr)
+            
+        if neutrino_only:
+          for br in genie_branches:
+            arr = np.asarray(arrays_genie[br][i], dtype=np.float32)
+            event_group.create_dataset(f"genie_{br}", data=arr)
 
 
 def parse_args():

@@ -131,6 +131,7 @@ def main():
   plane0_event_ids = []
   plane1_event_ids = []
   plane2_event_ids = []
+  neutrino_energies = []
   
   with h5py.File(args.inputfile, "r") as f:
     events = f["events"]
@@ -145,6 +146,9 @@ def main():
       adcintegral_event = event["Window_adcintegral"]
       apacrp_event      = event["Window_apacrp"]
       planeid_event     = event["Window_planeid"]
+      
+      neutrino_energy   = event["genie_E"] if "genie_E" in event else None
+      
 
       # Loop over sub-events
       for sub in timepeak_event:
@@ -248,6 +252,8 @@ def main():
           plane0_event_ids.append(event_counter)
           plane1_event_ids.append(event_counter)
           plane2_event_ids.append(event_counter)
+          if neutrino_energy is not None:
+            neutrino_energies.append(neutrino_energy)
 
   print('saving images in a .npz file')
   np.savez_compressed(args.outputfile,
@@ -256,7 +262,8 @@ def main():
                       plane2=np.array(plane2_list),
                       plane0_event_ids=np.array(plane0_event_ids),
                       plane1_event_ids=np.array(plane1_event_ids),
-                      plane2_event_ids=np.array(plane2_event_ids))
+                      plane2_event_ids=np.array(plane2_event_ids),
+                      neutrino_energies=np.array(neutrino_energies))
 
   print(f"Saved {len(plane0_list)} p0 images to {args.outputfile}")
   print(f"Saved {len(plane1_list)} p1 images to {args.outputfile}")
