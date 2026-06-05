@@ -253,7 +253,7 @@ def main():
           plane1_event_ids.append(event_counter)
           plane2_event_ids.append(event_counter)
           if neutrino_energy is not None:
-            neutrino_energies.append(neutrino_energy)
+            neutrino_energies.append(np.array([neutrino_energy]))
 
   print('saving images in a .npz file')
   np.savez_compressed(args.outputfile,

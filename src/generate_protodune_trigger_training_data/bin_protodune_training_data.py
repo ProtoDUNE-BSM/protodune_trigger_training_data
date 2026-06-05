@@ -216,7 +216,7 @@ def main():
           all_images.append([event_counter, img])
           event_ids.append(event_counter)
           if neutrino_energy is not None:
-            neutrino_energies.append(neutrino_energy)
+            neutrino_energies.append(np.array([neutrino_energy]))
 
   print('saving images in a .npz file')
   np.savez_compressed(args.outputfile,
