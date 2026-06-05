@@ -154,7 +154,8 @@ def main():
       apacrp_event      = event["Window_apacrp"]
       planeid_event     = event["Window_planeid"]
       
-      neutrino_energy   = event["genie_E"] if "genie_E" in event else None
+      #neutrino_energy   = event["genie_E"] if "genie_E" in event else None
+      neutrino_energy   = float(event["genie_E"][()]) if "genie_E" in event else None
 
       # Loop over sub-events
       for sub in timepeak_event:
@@ -216,7 +217,7 @@ def main():
           all_images.append([event_counter, img])
           event_ids.append(event_counter)
           if neutrino_energy is not None:
-            neutrino_energies.append(np.array([neutrino_energy]))
+            neutrino_energies.append(neutrino_energy)
 
   print('saving images in a .npz file')
   np.savez_compressed(args.outputfile,
